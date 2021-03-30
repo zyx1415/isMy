@@ -2,12 +2,12 @@
  * @Description: 未添加描述
  * @Date: 2021-03-18 15:12:33
  * @LastEditors: JackyChou
- * @LastEditTime: 2021-03-27 00:57:24
+ * @LastEditTime: 2021-03-28 16:11:24
  */
 import type { FC, Dispatch, SetStateAction } from 'react';
 import { useState } from 'react';
 import React, { Fragment } from 'react';
-import { Card, Button, Drawer, Table, Form, Row, Col, Input } from 'antd';
+import { Card, Button, Drawer, Table, Form, Row, Col, Input, message } from 'antd';
 import type { ColumnsType } from 'antd/lib/table';
 import {
   SwapRightOutlined,
@@ -39,6 +39,7 @@ const CarpoolInfo: FC<CarpoolInfoProps> = (props) => {
   // const [userApplyInfo, setUserApplyInfo] = useState<uinacarinfo>();
   const [isShowApply, setIsShowApply] = useState<boolean>(false); // 申请信息Drawer
   const [defaultText, setDefaultText] = useState<string>(''); // 留言
+  // const [userDataChange, setUserDataChange] = useState<uinacarinfo[]>(userData); // 每一个拼车单的人
   const [form] = Form.useForm();
   // console.log(`userData`, userData);
   const onReset = () => {
@@ -46,16 +47,17 @@ const CarpoolInfo: FC<CarpoolInfoProps> = (props) => {
   };
   const onFinish = (params: any) => {
     services(
-      `/joinCarFriend?poolingcarid=${poolingInfo.poolingcarid}&incarmsg=${
+      `/joinCarFriend?poolingcarid=${poolingInfo.poolingcarid}&listenerStatus=false&incarmsg=${
         params.inCarMsg ? params.inCarMsg : ''
       }&qqnum=${params.qqnum ? params.qqnum : ''}&wxnum=${params.wxnum ? params.wxnum : ''}&phone=${
         params.phone ? params.phone : ''
       }&email=${params.email ? params.email : ''}`,
       { method: 'post' },
-    ).then((params) => {
-      console.log(`params来了`, params);
+    ).then((res) => {
+      console.log(`res申请加入`, res);
       onReset();
       setIsShowApply(!isShowApply);
+      setIsShowDrawer(!isShowDrawer);
     });
   };
 
@@ -81,7 +83,20 @@ const CarpoolInfo: FC<CarpoolInfoProps> = (props) => {
               返回
             </Button>
             {isCarAction ? (
-              <Button style={{ width: '30%', minWidth: '50px' }} type="primary" size="large" onClick={() => {}}>
+              <Button
+                style={{ width: '30%', minWidth: '50px' }}
+                type="primary"
+                size="large"
+                onClick={() => {
+                  services(`/quitCarFriend/${poolingInfo.poolingcarid}`).then((res) => {
+                    message.success('退出成功');
+                    setIsShowDrawer(!isShowDrawer);
+                    // services(`/findDetailCarFriend/${poolingInfo.poolingcarid}`).then((params) => {
+                    //   setUserDataChange(params.data);
+                    // });
+                  });
+                }}
+              >
                 申请退出
               </Button>
             ) : (
@@ -137,6 +152,7 @@ const CarpoolInfo: FC<CarpoolInfoProps> = (props) => {
             setIsShowApply(!isShowApply);
           }}
         >
+          {/* 提交加入拼车表单具体内容 */}
           <Form form={form} onFinish={onFinish}>
             <Row justify="center">
               <Col style={{ padding: '10px 0', color: 'red' }}>
@@ -212,6 +228,7 @@ const CarpoolInfo: FC<CarpoolInfoProps> = (props) => {
                 </Form.Item>
               </Col>
             </Row>
+            {/* 按钮 */}
             <Row justify="center">
               <Col span={6}>
                 <Form.Item>

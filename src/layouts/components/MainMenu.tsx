@@ -2,7 +2,7 @@
  * @Description: 未添加描述
  * @Date: 2021-02-24 11:30:00
  * @LastEditors: JackyChou
- * @LastEditTime: 2021-03-27 00:54:25
+ * @LastEditTime: 2021-03-30 00:44:58
  */
 import type { FC } from 'react';
 import React, { Fragment, useState, useEffect } from 'react';
@@ -97,6 +97,7 @@ const MainMenu: FC<any> = (props) => {
   if (error) {
     message.error(error);
   }
+
   // 控制登录头像
   useEffect(() => {
     if (data && data.action === 'index') {
@@ -105,6 +106,7 @@ const MainMenu: FC<any> = (props) => {
       setIsUser(1);
     }
   }, [data]);
+
   useEffect(() => {
     setHash(props.pathname);
   }, [props.pathname]);
@@ -135,7 +137,14 @@ const MainMenu: FC<any> = (props) => {
         >
           司机找单
         </Menu.Item>
-        <Menu.Item key="discuss">讨论区</Menu.Item>
+        <Menu.Item
+          key="/wm/DriverOrder"
+          onClick={() => {
+            history.push('/wm/DriverOrder');
+          }}
+        >
+          我的接单
+        </Menu.Item>
         <Menu.Item
           key="/wm/Contact"
           onClick={() => {

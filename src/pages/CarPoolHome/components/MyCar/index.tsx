@@ -2,7 +2,7 @@
  * @Description: 未添加描述
  * @Date: 2021-03-09 09:28:57
  * @LastEditors: JackyChou
- * @LastEditTime: 2021-03-27 00:04:43
+ * @LastEditTime: 2021-03-28 15:01:40
  */
 import type { FC, SetStateAction, Dispatch } from 'react';
 import React, { useState, useEffect } from 'react';
@@ -29,6 +29,7 @@ const MyCar: FC<setIsShowMyCarProps> = (props) => {
   const { isShowMyCar, setIsShowMyCar, inUserColumns, isCarAction } = props;
   const [isShowMyHistory, setIsShowMyHistory] = useState<boolean>(false); // 我的历史记录抽屉
   const [myCarData, setMyCarData] = useState<carFriendProps[]>(); // 我的所有拼车
+  const [historyData, setHistoryData] = useState<carFriendProps[]>(); // 我的拼车历史
   const [userData, setUserData] = useState<uinacarinfo[]>(); // 每一个拼车单的人
   const [poolingInfo, setPoolingInfo] = useState<carFriendProps>();
   const [isShowDrawer, setIsShowDrawer] = useState<boolean>(false); // 从我的记录里打开的详细
@@ -43,7 +44,6 @@ const MyCar: FC<setIsShowMyCarProps> = (props) => {
   useEffect(() => {
     services('/findMyCarPooling').then((params) => {
       setMyCarData(params.data);
-      // console.log(`params拼车44`, params);
     });
   }, [isShowMyCar]);
   return (
@@ -63,6 +63,10 @@ const MyCar: FC<setIsShowMyCarProps> = (props) => {
           style={{ float: 'right' }}
           onClick={() => {
             setIsShowMyHistory(!isShowMyHistory);
+            services(`/findHistoryCarPooling`).then((params) => {
+              console.log(`查看历史`, params);
+              setHistoryData(params.data);
+            });
           }}
         >
           查看历史
@@ -124,7 +128,42 @@ const MyCar: FC<setIsShowMyCarProps> = (props) => {
         onClose={() => {
           setIsShowMyHistory(!isShowMyHistory);
         }}
-      ></Drawer>
+      >
+        <List
+          itemLayout="horizontal"
+          dataSource={historyData}
+          renderItem={(item) => (
+            <List.Item>
+              <List.Item.Meta
+                title={
+                  // <a
+                  //   onClick={() => {
+                  //     findDetailCarFriend(item.poolingcarid!);
+                  //     setIsShowDrawer(!isShowDrawer);
+                  //   }}
+                  // >
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <h3>{item?.readyplace}</h3>
+                    <SwapRightOutlined style={{ fontSize: '30px', margin: '0 5px' }} />
+                    <h3>{item?.goplace}</h3>
+                  </div>
+                  // </a>
+                }
+                description={
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <p>
+                      出发时间段： {moment(item?.readtime).format('YYYY/MM/DD HH:mm')} ~{' '}
+                      {moment(item?.gotime).format('YYYY/MM/DD HH:mm')}
+                    </p>
+                  </div>
+                }
+              />
+              <p> 总人数：{item?.totalnum}个~~</p>
+              <p> 余座：{item?.getnum}个</p>
+            </List.Item>
+          )}
+        />
+      </Drawer>
     </Drawer>
   );
 };

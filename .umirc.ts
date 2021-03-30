@@ -2,7 +2,7 @@
  * @Description: 未添加描述
  * @Date: 2021-02-23 09:37:03
  * @LastEditors: JackyChou
- * @LastEditTime: 2021-03-27 00:53:47
+ * @LastEditTime: 2021-03-29 23:39:23
  */
 import { defineConfig } from 'umi';
 
@@ -47,6 +47,12 @@ export default defineConfig({
           path: '/wm/Driver',
           component: './Driver',
           title: '司机找单',
+          exact: true,
+        },
+        {
+          path: '/wm/DriverOrder',
+          component: './DriverOrder',
+          title: '我的抢单',
           exact: true,
         },
       ],

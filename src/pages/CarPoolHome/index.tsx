@@ -2,7 +2,7 @@
  * @Description: 未添加描述
  * @Date: 2021-02-24 14:47:33
  * @LastEditors: JackyChou
- * @LastEditTime: 2021-03-27 00:03:56
+ * @LastEditTime: 2021-03-30 23:34:31
  */
 import type { FC } from 'react';
 
@@ -37,7 +37,7 @@ export type carFriendProps = {
   poolingstatus?: number; //	拼车状态
   leaveids?: string; //	退出，请出拼车的id
 };
-type Orders = carFriendProps[];
+export type Orders = carFriendProps[];
 // 拼车人信息
 export type uinacarinfo = {
   poolingcarid: number; // 拼车id，每一个拼车id唯一
@@ -56,6 +56,49 @@ export type uinacarinfo = {
   email?: string; // 邮箱
 };
 
+// 表格columns
+export const columns: ColumnsType<any> = [
+  {
+    align: 'center',
+    width: 30,
+    title: '头像',
+    dataIndex: 'nickname',
+    render(text, recode) {
+      return (
+        <Fragment>
+          <img src={recode.chathead} alt="" style={{ borderRadius: '5px' }} />
+        </Fragment>
+      );
+    },
+  },
+  {
+    align: 'center',
+    width: 100,
+    title: '性别',
+    dataIndex: 'gender',
+    render(text) {
+      return text === 1 ? '男' : '女';
+    },
+  },
+  {
+    align: 'center',
+    width: 200,
+    title: '加入时间',
+    dataIndex: 'jointime',
+    render(text) {
+      return moment(text).format('YYYY年MM月DD日 HH:mm');
+    },
+  },
+  {
+    title: '信誉',
+    dataIndex: 'credibility',
+  },
+
+  {
+    title: '留言',
+    dataIndex: 'incarmsg',
+  },
+];
 const CarPoolHome: FC = () => {
   const [orderGroup, setOrderGroup] = useState<Orders>(); // 拼车单
   const [isShowDrawer, setIsShowDrawer] = useState<boolean>(false); // 详情抽屉
@@ -68,56 +111,6 @@ const CarPoolHome: FC = () => {
   const [isModalShow, setIsModalShow] = useState<boolean>(false);
   const [lookUserInfo, setLookUserInfo] = useState<uinacarinfo>();
   const [isCarAction, setIsCarAction] = useState<boolean>();
-
-  const columns: ColumnsType<any> = [
-    {
-      align: 'center',
-      width: 30,
-      title: '昵称',
-      dataIndex: 'nickname',
-      render(text, recode) {
-        return (
-          <Fragment>
-            <img src={recode.chathead} alt="" style={{ borderRadius: '5px' }} />
-            {text}
-          </Fragment>
-        );
-      },
-    },
-    {
-      align: 'center',
-      width: 100,
-      title: '性别',
-      dataIndex: 'gender',
-      render(text) {
-        return text === 1 ? '男' : '女';
-      },
-    },
-    {
-      align: 'center',
-      width: 200,
-      title: '加入时间',
-      dataIndex: 'jointime',
-      render(text) {
-        return moment(text).format('YYYY年MM月DD日 HH:mm');
-      },
-    },
-    {
-      title: '信誉',
-      dataIndex: 'credibility',
-    },
-
-    // {
-    //   title: '黑记录',
-    //   dataIndex: 'blackRecode',
-    //   sortDirections: ['descend'],
-    //   sorter: (a: any, b: any) => a.blackRecode.length - b.blackRecode.length,
-    // },
-    {
-      title: '留言',
-      dataIndex: 'incarmsg',
-    },
-  ];
 
   const inUserColumns: ColumnsType<any> = [
     ...columns,
@@ -132,7 +125,15 @@ const CarPoolHome: FC = () => {
             title="确认请出吗？"
             okText="确定"
             cancelText="取消"
-            onConfirm={() => {}}
+            onConfirm={() => {
+              services(`/letOut/${recode.poolingcarid}/${recode.userid}/这个人的人品不行`).then((params) => {
+                console.log(`清楚`, params);
+                if (params.state === 'error') message.error('当前人数过少，不能清出哦');
+                // services(`/getCallOut/${recode.poolingcarid}`).then((asd) => {
+                //   console.log(`asd`, asd);
+                // });
+              });
+            }}
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
             <Button type="dashed" size="large">
